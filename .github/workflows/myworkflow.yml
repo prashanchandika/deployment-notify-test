@@ -50,14 +50,5 @@ jobs:
           fi
 
       - name: Send Notification
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
         run: |
-          FAILED_MSG=$(cat failed_jobs.txt 2>/dev/null || echo "No failures")
-          
-          curl -X POST -H 'Content-type: application/json' --data '{
-            "text": "🚀 *Deployment Workflow Status*\n
-            ${{ env.WORKFLOW_STATUS }}\n
-            '"$FAILED_MSG"'\n
-            🔗 <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
-          }' $SLACK_WEBHOOK_URL
+          echo ${{ env.WORKFLOW_STATUS }}
