@@ -48,6 +48,7 @@ jobs:
           FAILED_JOBS=""
           
           for job in job1 job2; do
+            echo ${{ job }}
             if [[ "${{ job }}.result" == "failure" ]]; then
               FAILED_JOBS+="❌ $job failed\n"
             fi
