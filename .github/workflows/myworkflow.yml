@@ -23,8 +23,19 @@ jobs:
           echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
       - name: Test Step
         run: |
-          echo "sleeping for 10"
+          echo "sleeping for 5"
           sleep 10
+  job2:
+    name: Job2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test Step
+        run: |
+          echo "sleeping for 5"
+          sleep 10
+          exit 1
+          
 
         
   notify:
@@ -36,7 +47,7 @@ jobs:
         run: |
           FAILED_JOBS=""
           
-          for job in job1; do
+          for job in job1 job2; do
             if [[ "${{ job.result }}" == "failure" ]]; then
               FAILED_JOBS+="❌ $job failed\n"
             fi
