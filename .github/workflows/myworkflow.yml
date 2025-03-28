@@ -40,7 +40,7 @@ jobs:
         
   notify:
     runs-on: ubuntu-latest
-    needs: [job1]  # Monitors all jobs
+    needs: [job1, job2]  # Monitors all jobs
     if: always()  # Runs even if jobs fail
     steps:
       - name: Determine Failed Jobs
@@ -48,7 +48,7 @@ jobs:
           FAILED_JOBS=""
           
           for job in job1 job2; do
-            if [[ "${{ job.result }}" == "failure" ]]; then
+            if [[ "${{ job }}.result" == "failure" ]]; then
               FAILED_JOBS+="❌ $job failed\n"
             fi
           done
