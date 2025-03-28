@@ -1,0 +1,63 @@
+name: Test Workflow
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+env:
+  ENV: "test"
+
+jobs:
+  job1:
+    name: Job1
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Start Deployment Timer
+        if: always()
+        id: start-time
+        run: |
+          echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
+      - name: Test Step
+        run: |
+          echo "sleeping for 10"
+          sleep 10
+
+        
+  notify:
+    runs-on: ubuntu-latest
+    needs: [job1]  # Monitors all jobs
+    if: always()  # Runs even if jobs fail
+    steps:
+      - name: Determine Failed Jobs
+        run: |
+          FAILED_JOBS=""
+          
+          for job in job1; do
+            if [[ "${{ job.result }}" == "failure" ]]; then
+              FAILED_JOBS+="❌ $job failed\n"
+            fi
+          done
+
+          if [[ -z "$FAILED_JOBS" ]]; then
+            echo "WORKFLOW_STATUS=✅ All jobs succeeded!" >> $GITHUB_ENV
+          else
+            echo -e "$FAILED_JOBS" > failed_jobs.txt
+            echo "WORKFLOW_STATUS=❌ Some jobs failed!" >> $GITHUB_ENV
+          fi
+
+      - name: Send Notification
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          FAILED_MSG=$(cat failed_jobs.txt 2>/dev/null || echo "No failures")
+          
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "text": "🚀 *Deployment Workflow Status*\n
+            ${{ env.WORKFLOW_STATUS }}\n
+            '"$FAILED_MSG"'\n
+            🔗 <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+          }' $SLACK_WEBHOOK_URL
