@@ -61,7 +61,12 @@ jobs:
             echo "WORKFLOW_STATUS=❌ Some jobs failed!" >> $GITHUB_ENV
           fi
 
+      - name: Capture End Time
+        run: echo "END_TIME=$(date +%s)" >> $GITHUB_ENV
+
       - name: Send Notification
         run: |
           echo "🚀 Workflow Status: ${{ env.WORKFLOW_STATUS }}"
           cat failed_jobs.txt 2>/dev/null || echo "No failures"
+          DEPLOY_TIME=$((END_TIME - START_TIME))
+          echo "Deployment Time is: $DEPLOY_TIME"
