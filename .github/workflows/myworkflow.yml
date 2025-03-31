@@ -66,8 +66,7 @@ jobs:
           echo "Start Time: ${{ env.START_TIME }}"
           ELAPSED_TIME=$(( $(date +%s) - START_TIME ))
           echo " Elapsed time: $ELAPSED_TIME"
-          DEPLOY_TIME=$((ELAPSED_TIME / 60))m $((ELAPSED_TIME % 60))s
-          echo $DEPLOY_TIME >> $GITHUB_ENV
+          echo "DEPLOY_TIME=$((ELAPSED_TIME / 60))m $((ELAPSED_TIME % 60))s" | tee $GITHUB_ENV
 
       - name: Send Notification
         run: |
