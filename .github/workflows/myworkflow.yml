@@ -62,7 +62,11 @@ jobs:
           fi
 
       - name: Capture End Time
-        run: echo "END_TIME=$(date +%s)" >> $GITHUB_ENV
+        run: |
+          echo "Start Time: ${{ env.START_TIME}}"
+          ELAPSED_TIME=$(( $(date +%s) - START_TIME ))
+          echo "DEPLOY_TIME=$((ELAPSED_TIME / 60))m $((ELAPSED_TIME % 60))s" >> $GITHUB_ENV
+          echo ${{ env.DEPLOY_TIME }}
 
       - name: Send Notification
         run: |
