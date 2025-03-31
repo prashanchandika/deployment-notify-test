@@ -63,14 +63,15 @@ jobs:
 
       - name: Capture End Time
         run: |
-          echo "Start Time: ${{ env.START_TIME}}"
+          echo "Start Time: ${{ env.START_TIME }}"
           ELAPSED_TIME=$(( $(date +%s) - START_TIME ))
-          echo "DEPLOY_TIME=$((ELAPSED_TIME / 60))m $((ELAPSED_TIME % 60))s" >> $GITHUB_ENV
-          echo ${{ env.DEPLOY_TIME }}
+          echo " Elapsed time: $ELAPSED_TIME"
+          DEPLOY_TIME=$((ELAPSED_TIME / 60))m $((ELAPSED_TIME % 60))s
+          echo $DEPLOY_TIME >> $GITHUB_ENV
 
       - name: Send Notification
         run: |
           echo "🚀 Workflow Status: ${{ env.WORKFLOW_STATUS }}"
           cat failed_jobs.txt 2>/dev/null || echo "No failures"
-          ELAPSED_TIME=$(( $(date +%s) - START_TIME ))
-          echo "DEPLOY_TIME=$((ELAPSED_TIME / 60))m $((ELAPSED_TIME % 60))s"
+          echo "Deployment Time: ${{ env.DEPLOY_TIME }}"
+          
