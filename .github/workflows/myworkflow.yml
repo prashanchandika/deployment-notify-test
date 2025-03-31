@@ -11,14 +11,24 @@ env:
   ENV: "test"
 
 jobs:
+  start_time: 
+    name: StartTime
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Start Deployment Timer
+        run: |
+          echo $(date +%s) > start_time.txt
+      - name: Upload Start Time
+        uses: actions/upload-artifact@v4
+        with:
+          name: start-time
+          path: start_time.txt
+    
   job1:
     name: Job1
     runs-on: ubuntu-latest
     steps:
-      - name: Start Deployment Timer
-        if: always()
-        id: start-time
-        run: echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
       - name: Test Step
         run: |
           echo "sleeping for 5"
@@ -60,14 +70,26 @@ jobs:
             echo -e "$FAILED_JOBS" > failed_jobs.txt
             echo "WORKFLOW_STATUS=❌ Some jobs failed!" >> $GITHUB_ENV
           fi
-
-      - name: Capture End Time
+          
+      - name: Download Start Time
+        uses: actions/download-artifact@v4
+        with:
+          name: start-time
+          
+      - name: Read Start Time
         run: |
-          echo "Start Time: ${{ env.START_TIME }}"
-          ELAPSED_TIME=$(( $(date +%s) - START_TIME ))
-          echo " Elapsed time: $ELAPSED_TIME"
-          echo "DEPLOY_TIME=$((ELAPSED_TIME / 60))m $((ELAPSED_TIME % 60))s" | tee $GITHUB_ENV
+          START_TIME=$(cat start_time.txt)
+          echo "START_TIME=$START_TIME" >> $GITHUB_ENV
 
+      - name: Capture End Time & Calculate Deployment Time
+        run: |
+          END_TIME=$(date +%s)
+          ELAPSED_TIME=$((END_TIME - START_TIME))
+          DEPLOY_TIME="$((ELAPSED_TIME / 60))m $((ELAPSED_TIME % 60))s"
+          
+          echo "DEPLOY_TIME=$DEPLOY_TIME" >> $GITHUB_ENV
+          echo "Deployment Time: $DEPLOY_TIME"
+          
       - name: Send Notification
         run: |
           echo "🚀 Workflow Status: ${{ env.WORKFLOW_STATUS }}"
