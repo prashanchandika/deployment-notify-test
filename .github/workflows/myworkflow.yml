@@ -46,7 +46,7 @@ jobs:
 
   notify:
     needs: [job1, job2]  # Monitor all jobs
-    uses: prashanchandika/notify-workflow/.github/workflows/notify.yml@main  # Calling Remote Workflow
+    uses: prashanchandika/notify-workflow/.github/workflows/notify.yml@main
     with:
       needs: '["job1", "job2"]'
     secrets:
