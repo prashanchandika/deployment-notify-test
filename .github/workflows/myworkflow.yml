@@ -45,54 +45,10 @@ jobs:
           exit 1  # Simulating failure
 
   notify:
-    runs-on: ubuntu-latest
     needs: [job1, job2]  # Monitor all jobs
-    if: always()  # Runs even if jobs fail
-    steps:
-      - name: Convert Needs to JSON
-        run: |
-          echo '${{ toJSON(needs) }}' > needs.json
-          cat needs.json  # Debugging output
-
-      - name: Determine Failed Jobs
-        run: |
-          FAILED_JOBS=""
-          for job in $(jq -r 'keys[]' needs.json); do
-            RESULT=$(jq -r ".\"$job\".result" needs.json)
-            if [[ "$RESULT" == "failure" ]]; then
-              FAILED_JOBS+="❌ $job failed\n"
-            fi
-          done
-
-          if [[ -z "$FAILED_JOBS" ]]; then
-            echo "WORKFLOW_STATUS=✅ All jobs succeeded!" >> $GITHUB_ENV
-          else
-            echo -e "$FAILED_JOBS" > failed_jobs.txt
-            echo "WORKFLOW_STATUS=❌ Some jobs failed!" >> $GITHUB_ENV
-          fi
-          
-      - name: Download Start Time
-        uses: actions/download-artifact@v4
-        with:
-          name: start-time
-          
-      - name: Read Start Time
-        run: |
-          START_TIME=$(cat start_time.txt)
-          echo "START_TIME=$START_TIME" >> $GITHUB_ENV
-
-      - name: Capture End Time & Calculate Deployment Time
-        run: |
-          END_TIME=$(date +%s)
-          ELAPSED_TIME=$((END_TIME - START_TIME))
-          DEPLOY_TIME="$((ELAPSED_TIME / 60))m $((ELAPSED_TIME % 60))s"
-          
-          echo "DEPLOY_TIME=$DEPLOY_TIME" >> $GITHUB_ENV
-          echo "Deployment Time: $DEPLOY_TIME"
-          
-      - name: Send Notification
-        run: |
-          echo "🚀 Workflow Status: ${{ env.WORKFLOW_STATUS }}"
-          cat failed_jobs.txt 2>/dev/null || echo "No failures"
-          echo "Deployment Time: ${{ env.DEPLOY_TIME }}"
+    uses: prashanchandika/notify-workflow/.github/workflows/notify.yml@main  # Calling Remote Workflow
+    with:
+      needs: '["job1", "job2"]'
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
           
