@@ -47,6 +47,7 @@ jobs:
   notify:
     needs: [job1, job2]  # Monitor all jobs
     uses: prashanchandika/notify-workflow/.github/workflows/notify.yml@main
+    if: always()
     with:
       job_list: '["job1", "job2"]'
     secrets:
