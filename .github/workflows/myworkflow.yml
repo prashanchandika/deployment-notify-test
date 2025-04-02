@@ -42,7 +42,7 @@ jobs:
           exit 1  # Simulating failure
 
   notify:
-    needs: [job1, job2]  # Monitor all jobs
+    needs: [record-start-time, job1, job2]  # Monitor all jobs
     uses: prashanchandika/notify-workflow/.github/workflows/notify.yml@main
     if: always()
     with:
