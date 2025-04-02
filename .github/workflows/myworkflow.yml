@@ -49,7 +49,7 @@ jobs:
     uses: prashanchandika/notify-workflow/.github/workflows/notify.yml@main
     if: always()
     with:
-      job_list: '["job1", "job2"]'
+      job_list: ${{ toJson(needs) }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
