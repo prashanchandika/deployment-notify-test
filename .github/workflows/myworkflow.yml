@@ -11,19 +11,16 @@ env:
   ENV: "test"
 
 jobs:
-  start_time: 
+  record-start-time:
     name: StartTime
     runs-on: ubuntu-latest
     if: always()
+    outputs:
+      start_time: ${{ steps.capture-time.outputs.start_time }}
     steps:
-      - name: Start Deployment Timer
-        run: |
-          echo $(date +%s) > start_time.txt
-      - name: Upload Start Time
-        uses: actions/upload-artifact@v4
-        with:
-          name: start-time
-          path: start_time.txt
+      - name: Capture Start Time
+        id: capture-time
+        run: echo "start_time=$(date +%s)" >> $GITHUB_OUTPUT
     
   job1:
     name: Job1
@@ -50,6 +47,7 @@ jobs:
     if: always()
     with:
       job_list: ${{ toJson(needs) }}
+      start_time: ${{ needs.record-start-time.outputs.start_time }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
