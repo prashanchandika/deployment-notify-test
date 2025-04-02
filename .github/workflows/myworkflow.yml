@@ -49,7 +49,8 @@ jobs:
     uses: prashanchandika/notify-workflow/.github/workflows/notify.yml@main
     with:
       job_list: '["job1", "job2"]'
-# Test Comment
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+# Test Comment
           
